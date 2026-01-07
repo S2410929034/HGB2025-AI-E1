@@ -1,0 +1,86 @@
+services:
+  # ----------------------------------------
+  # PostgreSQL 18
+  # ----------------------------------------
+  postgres:
+    image: postgres:18.1
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      # Note: mount at /var/lib/postgresql for Postgres 18+
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+    # Ensures logical replication is enabled in the WAL  
+    command: ["postgres", "-c", "wal_level=logical"]
+  # ----------------------------------------
+  # Kafka (KRaft)
+  # ----------------------------------------
+  kafka:
+    image: docker.io/bitnamilegacy/kafka:latest
+    container_name: kafka
+    restart: always
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      # KRaft configuration
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      
+      # Define two listeners: INTERNAL (for Docker) and EXTERNAL (for Host)
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:9094,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_KRAFT_CLUSTER_ID=kraft-cluster-1
+    ports:
+      - "9092:9092"
+      - "9094:9094" # Port for your Python scripts
+
+  # ----------------------------------------
+  # Kafka Connect + Debezium
+  # ----------------------------------------
+  connect:
+    image: quay.io/debezium/connect:2.2
+    container_name: connect
+    restart: always
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - KEY_CONVERTER_SCHEMAS_ENABLE=false
+      - VALUE_CONVERTER_SCHEMAS_ENABLE=false
+      - CONFIG_STORAGE_TOPIC=connect-configs
+      - OFFSET_STORAGE_TOPIC=connect-offsets
+      - STATUS_STORAGE_TOPIC=connect-statuses
+      - GROUP_ID=connect-cluster
+      - CONNECT_REST_ADVERTISED_HOST_NAME=connect
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+volumes:
+  pgdata:
+  kafka_data:
