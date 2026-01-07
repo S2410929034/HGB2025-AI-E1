@@ -539,19 +539,15 @@ For this high-volume fraud detection scenario with multiple independent consumer
 
 - High Throughput Handling
   - Kafka can easily handle hundreds of thousands of messages per second
-  - Debezium efficiently captures database changes without impacting OLTP performance
   - Avoids overwhelming PostgreSQL with polling queries from multiple consumers
 
 - Multiple Independent Consumers
   - Kafka's pub/sub model allows multiple fraud detection agents to consume the same stream independently
   - Each consumer maintains its own offset, enabling parallel processing without coordination
-  - New detection agents can be added dynamically without modifying existing infrastructure
-  - Example: Agent1 detects high-transaction fraud, Agent2 detects velocity-based patterns, Agent3 detects network anomalies
 
 - Near Real-Time Processing
   - Change events propagate to Kafka within milliseconds
   - Fraud alerts can be generated within seconds of transaction occurrence
-  - Critical for stopping fraudulent transactions before completion
 
 - Database Protection
   - CDC captures changes from PostgreSQL's transaction log, not through polling queries
@@ -561,7 +557,7 @@ For this high-volume fraud detection scenario with multiple independent consumer
 - Event-Driven Architecture
   - Enables reactive fraud detection workflows triggered immediately upon transaction creation
   - Events contain before/after state, allowing agents to analyze transaction patterns
-  - Facilitates alerts to be forwarded to downstream systems (alerting services, dashboards, case management)
+  - Facilitates alerts to be forwarded to downstream systems
 
 - Fault Tolerance & Reliability
   - Kafka provides message durability and replayability
@@ -904,14 +900,14 @@ Compare the proposed architecture to Exercise 3 from previous lecture where the 
 
 ### Performance Comparison:
 - Latency
-  - Debezium CDC + Kafka: Milliseconds (real-time streaming)
-  - Spark JDBC: Minutes to hours (batch interval dependent)
+  - Debezium CDC + Kafka: Real-time streaming
+  - Spark JDBC: Batch interval dependent
 - Throughput
   - Debezium CDC + Kafka: 100K+ tps sustained
   - Spark JDBC: Limited by polling frequency and database connection pool
 - Database Load
-  - Debezium CDC + Kafka: Minimal (reads WAL log only)
-  - Spark JDBC: High (SELECT queries every polling interval)
+  - Debezium CDC + Kafka: Minimal
+  - Spark JDBC: High
 
 ### Resource Efficiency:
 - Compute Resources
@@ -930,14 +926,14 @@ Compare the proposed architecture to Exercise 3 from previous lecture where the 
 
 ### Use Cases:
 - Fraud Detection (Kafka)
-  - Real-time alerts: CDC excellent (sub-second); Spark poor (minute+ delays)
-  - Multiple consumers: CDC excellent (pub/sub); Spark moderate (shared cluster)
-  - High volume: CDC excellent (100K+ tps); Spark poor (database overload)
+  - Real-time alerts
+  - Multiple consumers
+  - High volume
 
 - Batch Analytics (Spark JDBC)
-  - Complex transformations: CDC poor (simple Python); Spark excellent (SQL, ML libraries)
-  - Historical aggregations: CDC moderate (replay events); Spark excellent (SQL aggregations)
-  - Data lake integration: CDC needs additional sink; Spark native (Parquet/Delta)
+  - Complex transformations
+  - Historical aggregations
+  - Data lake integration
 
 # Submission
 Send the exercises' resolution on Moodle and be ready to shortly present your solutions (5-8 minutes) in the next Exercise section (14.01.2026).
