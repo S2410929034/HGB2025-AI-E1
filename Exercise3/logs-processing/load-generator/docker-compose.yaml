@@ -1,0 +1,24 @@
+services:
+  generator:
+    image: adrianovogel/hgb-load-gen:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - KAFKA_BROKER=host.docker.internal:9095
+      - KAFKA_TOPIC=logs
+      - TARGET_RPS=10000
+      - ADDITIONAL_TERM=crash
+      - ADDITIONAL_TERM_RATE=100
+    deploy:
+      replicas: 1  # This enables to run more instances (containers)
+      resources:
+        limits:
+          memory: 2048M  
+          cpus: '1'
+    networks:
+      - streaming-net
+
+networks:
+  streaming-net:
+    external: true
+    name: streaming-net
