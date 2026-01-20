@@ -1018,7 +1018,7 @@ Result: no numbers smaller than 3
 
 ### Test 4: Late Data Handling
 **Expected:** Events arriving up to 30 seconds late are processed
-Result: they are ignored
+Result: processed if 30 seconds late or less; ignored if older than 30 seconds
 
 
 ## Step 7: Performance Testing
