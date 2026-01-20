@@ -6,14 +6,14 @@ services:
     environment:
       - KAFKA_BROKER=host.docker.internal:9095
       - KAFKA_TOPIC=logs
-      - TARGET_RPS=10000
+      - TARGET_RPS=60000
       - ADDITIONAL_TERM=crash
       - ADDITIONAL_TERM_RATE=100
     deploy:
-      replicas: 1  # This enables to run more instances (containers)
+      replicas: 4  # This enables to run more instances (containers)
       resources:
         limits:
-          memory: 2048M  
+          memory: 1024M  
           cpus: '1'
     networks:
       - streaming-net
