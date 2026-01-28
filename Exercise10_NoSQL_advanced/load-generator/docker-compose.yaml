@@ -1,0 +1,23 @@
+services:
+  generator:
+    image: adrianovogel/hgb-load-gen:stopafterXrecords
+    environment:
+      - KAFKA_BROKER=kafka:9092
+      - KAFKA_TOPIC=ingest-kafka
+      - TARGET_RPS=50000
+      - ADDITIONAL_TERM=crash
+      - ADDITIONAL_TERM_RATE=1000
+      - MAX_RECORDS=5000000
+    deploy:
+      replicas: 1 
+      resources:
+        limits:
+          memory: 2048M  
+          cpus: '1'
+    networks:
+      - pinot-demo
+
+networks:
+  pinot-demo:
+    name: pinot-demo
+    driver: bridge

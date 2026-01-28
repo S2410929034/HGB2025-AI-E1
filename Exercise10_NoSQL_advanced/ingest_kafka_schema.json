@@ -1,0 +1,20 @@
+{
+  "schemaName": "ingest_kafka",
+
+  "dimensionFieldSpecs": [
+    { "name": "status", "dataType": "STRING" },
+    { "name": "severity", "dataType": "STRING" },
+    { "name": "source_ip", "dataType": "STRING" },
+    { "name": "user_id", "dataType": "STRING" },
+    { "name": "content", "dataType": "STRING" }
+  ],
+
+  "dateTimeFieldSpecs": [
+    {
+      "name": "timestamp",
+      "dataType": "LONG",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ]
+}
