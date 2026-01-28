@@ -104,8 +104,8 @@ Moreover, what is the amount of data in the table?
 - This represents the amount of data ingested from Kafka at the time of query execution
 - The generator has finished running before the query was executed
 
-**What are the entries**
-- **Docs scanned (156 116):** Records that matched the WHERE clause filters (content LIKE '%vulnerability%' AND severity = 'High')
+**Metrics**
+- **Docs scanned (156 116):** Records that matched the WHERE clause filters (content `LIKE '%vulnerability%'` AND `severity = 'High'`)
 - **Entries scanned in filter (5 885 347):** Total character/field comparisons performed during filtering phase
 - **Segments (13):** Number of data segments queried, processed, and matched - Pinot created 13 segments to store 5M records
 - **Total table size (5 000 000):** Total number of documents in the ingest_kafka table
@@ -115,6 +115,7 @@ How this last query relates to the Spark Structured Streaming logs processing ex
 Both achieve a similar/the same result using different query methods:
 
 **Key differences highlighted:**
+
 Architecture:
 - Spark: Code-based stream processing with DataFrames/RDDs
 - Pinot: SQL-based OLAP with automatic indexing
@@ -138,7 +139,7 @@ Use cases:
 How performant is the advanced query? How long it takes to run and how many queries like this one could be served per second?
 
 **Query speed:** 
-- One run takes 4,852 ms (~ 4.9 seconds) for analytical query on 5M records with filtering and aggregation
+- One run takes 4 852 ms (~ 4.9 seconds) for analytical query on 5M records with filtering and aggregation
 - So approximatelly 0.2 such queries can be served per second
 
 Practical Exercise: From the material presented in the previous lecture on ``` Analytical Processing``` and Apache Pinot's features (available at https://docs.pinot.apache.org/ ), analyze and explain how the performance of the advanced query could be improved without demanding additional computing resources. Then, implement and demonstrate such an approach in Apache Pinot.
@@ -226,10 +227,10 @@ ORDER BY match_count DESC
 ```
 
 #### Step 4: Verify Performance difference
-**Before Optimization:**
+**Before Optimization:** (takes 4 852 ms)
 ![alt text](image-4.png)
 
-**After Optimization:**
+**After Optimization:** (takes 31 ms)
 ![alt text](image-5.png)
 
 ### Why This Works Without Additional Resources
@@ -293,12 +294,6 @@ Foundational Exercise: Considering the material presented in the lecture ``` NoS
 - **Sharding** divides data across servers for parallel processing
 - **Replication** copies each shard on multiple servers for fault tolerance
 - **Distributed SQL** coordinates query execution across all shards/replicas
-
-**Result:**
-- Queries on billions of records execute in milliseconds
-- System survives server failures without downtime
-- Throughput scales linearly as you add servers
-- No single point of failure in the cluster
 
 ### Comparison with Traditional Databases
 - **RDBMS**: Centralized, vertical scaling, ACID consistency, slow analytics
